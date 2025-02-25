@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Prompt Battle ArkDes</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <script src="../assets/js/connect.js" defer></script>
+    <script src="../assets/js/player.js" defer></script>
+  </head>
+  <body>
+    <section id="playerSection">
+      <main>
+        <p>
+          Välkommen, spelare
+          <span id="playerId" class="highlight">loading...</span>, till Prompt
+          Battle på ArkDes! På den stora skärmen kommmer en bild visas, och din
+          utmaning är att skriva egen prompt som genererar en så lik bild som
+          möjligt. <span class="highlight">Skriv på engelska</span>. När du
+          skrivit din prompt väljer du "Generera". Det kan ta flera sekunder
+          innan bilden är färdig.
+        </p>
+        <button id="startButton" onclick="startGame()" disabled>
+          Jag är redo!
+        </button>
+        <img src="../assets/img/girlwithpearlearring.jpg" />
+      </main>
+    </section>
+
+    <section id="gameSection" style="display: none">
+      <main>
+        <div
+          contenteditable="true"
+          id="promptInput"
+          class="editable"
+          data-placeholder="A surrealist painting of a man in a dark suit, white shirt, and red tie, wearing a black bowler hat. A green apple floats in front of his face, slightly off-center, obscuring most of his facial features while allowing one of his eyes to peek from behind. His posture is formal, standing straight against a muted cloudy sky with a subtle horizon line in the background. The painting style is soft and dreamlike, with a classic oil-painted texture, resembling mid-20th-century surrealist artwork. The lighting is soft and even, creating a mysterious yet balanced atmosphere."
+        ></div>
+        <button id="generateButton" onclick="handleGenerate()" disabled>
+          Generera
+        </button>
+      </main>
+      <aside id="images"></aside>
+    </section>
+  </body>
+</html>
