@@ -41,7 +41,7 @@ function displayError(errorMessage) {
   generateButton.disabled = false;
   generateButton.textContent = "Generera";
   const promptInput = document.getElementById("promptInput");
-  promptInput.contentEditable = false;
+  promptInput.contentEditable = true;
 }
 
 function handlePlayerId(id) {
