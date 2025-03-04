@@ -28,7 +28,7 @@ function displayImage({ playerId, prompt, imageUrl }) {
   const imageBox = document.createElement("div");
   imageBox.classList.add("image-box");
   imageBox.innerHTML = `
-    <img src="${imageUrl}" title="${prompt}" alt="${prompt}">
+    <img src="${imageUrl}" title="\"${prompt}"\" by ${playerId}" alt="\"${prompt}"\" by ${playerId}">
     <p class="small">${playerId}</p>
   `;
   gallery.prepend(imageBox);
