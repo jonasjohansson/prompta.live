@@ -28,7 +28,7 @@ function handleMessage(message) {
       updateImage(message.imageUrl, message.prompt);
       break;
     case "error":
-      displayError(message.message); // Handle errors
+      displayError(message.message);
       break;
     default:
       console.warn("⚠️ Unknown message type:", message.type);
@@ -37,10 +37,8 @@ function handleMessage(message) {
 
 function displayError(errorMessage) {
   alert(errorMessage);
-  const generateButton = document.getElementById("generateButton");
   generateButton.disabled = false;
   generateButton.textContent = "Generera";
-  const promptInput = document.getElementById("promptInput");
   promptInput.contentEditable = true;
 }
 
@@ -48,47 +46,26 @@ function handlePlayerId(id) {
   playerId = id;
   localStorage.setItem("playerId", playerId);
   document.getElementById("playerId").innerText = playerId;
-  const startButton = document.getElementById("startButton");
-  startButton.disabled = false;
+  document.getElementById("startButton").disabled = false;
 }
 
 function startGame() {
-  const playerSection = document.getElementById("playerSection");
-  if (playerSection) playerSection.remove(); // Remove from DOM
-  const gameSection = document.getElementById("gameSection");
-  gameSection.style.display = "block";
-
-  // Focus the editable div after rendering
-  const promptInput = document.getElementById("promptInput");
+  document.getElementById("playerSection")?.remove();
+  document.getElementById("gameSection").style.display = "block";
   promptInput.focus();
 }
 
 function handleGenerate() {
-  const generateButton = document.getElementById("generateButton");
-  if (generateButton) {
-    generateButton.disabled = true;
-    generateButton.textContent = "Bilden genereras…";
-  }
-  const promptInput = document.getElementById("promptInput");
+  generateButton.disabled = true;
+  generateButton.textContent = "Bilden genereras…";
   promptInput.contentEditable = false;
+
   console.log("⚡ Received 'generate' command from server!");
-  const prompt = promptInput.textContent;
-  if (prompt) submitPrompt(); // Automatically send the player's prompt
+  const prompt = promptInput.textContent.trim();
+  if (prompt) submitPrompt();
 }
 
 function handleSetRandomPrompt() {
-  const _prompts = [
-    "A mysterious figure in a dark forest, illuminated by moonlight.",
-    "Futuristic city skyline with neon lights and flying cars.",
-    "A cat wearing a space suit floating in zero gravity.",
-    "A surreal desert with giant melting clocks.",
-    "A knight in shining armor standing before a dragon.",
-    "A cozy cottage in a snowy landscape at sunset.",
-    "An astronaut discovering an ancient alien ruin on Mars.",
-    "A cyberpunk street with rain-soaked neon signs.",
-    "A grand palace floating on clouds in a fantasy world.",
-    "A giant whale swimming through a starry cosmic ocean.",
-  ];
   const prompts = [
     "A meticulously detailed oil painting in the style of the High Renaissance, depicting a woman with a mysterious half-smile, seated against a soft, atmospheric landscape. She wears a dark, subtly folded dress with delicate embroidery. The background features a misty, dreamlike Italian countryside with winding rivers and distant mountains, painted with sfumato—a soft, blended shading technique to create a realistic sense of depth. The lighting is delicate and balanced, casting a gentle glow on her serene face. The color palette consists of warm earthy tones, with subtle golden hues in the skin and soft shadows contouring her features. The subject’s enigmatic expression invites curiosity, while her hands rest gracefully in a relaxed pose.",
     "A stunning oil painting in the Dutch Golden Age style, featuring a young girl wearing a deep blue and gold turban, her head turned slightly to gaze directly at the viewer. A large pearl earring catches the soft, diffused light, creating a luminous effect. The painting captures delicate, photorealistic skin tones, with smooth, almost invisible brushstrokes blending seamlessly. The background is dark and featureless, emphasizing the subject’s glowing complexion and the warm golden highlights on her face. Her lips are slightly parted, adding an air of mystery, while the light falls naturally across her face, accentuating subtle textures in the fabric and skin.",
@@ -109,60 +86,73 @@ function handleSetRandomPrompt() {
 }
 
 function updateImage(imageUrl, imagePrompt) {
-  const generateButton = document.getElementById("generateButton");
-  const promptInput = document.getElementById("promptInput");
-  if (generateButton) {
-    generateButton.disabled = false;
-    generateButton.textContent = "Generera";
-    promptInput.contentEditable = true;
-  }
+  generateButton.disabled = false;
+  generateButton.textContent = "Generera";
+  promptInput.contentEditable = true;
+
   const images = document.getElementById("images");
   const imageContainer = document.createElement("div");
   imageContainer.classList.add("imageContainer");
-  imageContainer.innerHTML = `<img src="${imageUrl}" title="\"${imagePrompt}"\" by ${playerId}" alt="${imagePrompt} by ${playerId}"><p class="imageTitle"><span class="highlight">${playerId}</span>: ${imagePrompt}</p>`;
+  imageContainer.innerHTML = `
+    <img src="${imageUrl}" alt="${imagePrompt}">
+    <p class="imageTitle"><span class="highlight">${playerId}</span>: ${imagePrompt}</p>`;
   images.prepend(imageContainer);
 }
 
 function submitPrompt() {
-  const prompt = document.getElementById("promptInput").textContent;
+  const prompt = promptInput.textContent.trim();
   if (!playerId) {
     console.error("❌ Player ID is missing!");
     return;
   }
   ws.send(
-    JSON.stringify({
-      type: "submitPrompt",
-      playerId,
-      payload: { prompt },
-    })
+    JSON.stringify({ type: "submitPrompt", playerId, payload: { prompt } })
   );
 }
+
+// Get elements
 const promptInput = document.getElementById("promptInput");
 const generateButton = document.getElementById("generateButton");
+const maxLength = 400;
 
-// Prevent new lines (Enter key)
+// Prevent Enter key from adding new lines
 promptInput.addEventListener("keydown", function (event) {
   if (event.key === "Enter") {
-    event.preventDefault(); // Block Enter key
+    event.preventDefault();
   }
 });
 
+// Prevent exceeding 400 characters
+promptInput.addEventListener("input", function () {
+  let text = promptInput.innerText;
+  if (text.length > maxLength) {
+    promptInput.innerText = text.substring(0, maxLength);
+    setCaretToEnd(promptInput);
+  }
+  checkPlaceholder();
+});
+
+// Maintain caret position at the end after trimming input
+function setCaretToEnd(el) {
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+// Ensure placeholder & button state updates
 function checkPlaceholder() {
-  // Ensure no <br> remains when the input is empty
   if (!promptInput.innerText.trim() || promptInput.innerHTML === "<br>") {
-    promptInput.innerHTML = ""; // Remove <br> if it appears
+    promptInput.innerHTML = "";
     generateButton.disabled = true;
-    promptInput.classList.add("empty"); // Show placeholder
+    promptInput.classList.add("empty");
   } else {
     generateButton.disabled = false;
-    promptInput.classList.remove("empty"); // Hide placeholder
+    promptInput.classList.remove("empty");
   }
 }
 
-checkPlaceholder(); // Run on page load
-
-// Listen for input changes to update placeholder & button state
-promptInput.addEventListener("input", checkPlaceholder);
-
-// Ensure placeholder styling remains when the div loses focus
+checkPlaceholder();
 promptInput.addEventListener("blur", checkPlaceholder);
