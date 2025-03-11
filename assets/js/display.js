@@ -8,6 +8,7 @@ ws.onmessage = (event) => {
   if (message.type === "imageGenerated") {
     saveImageData(message);
     displayImage(message);
+    console.log(message);
   }
 };
 
@@ -23,14 +24,15 @@ function loadStoredImages() {
   storedImages.forEach(displayImage);
 }
 
-function displayImage({ playerId, imagePrompt, imageUrl }) {
+function displayImage({ playerId, prompt, imageUrl }) {
   const gallery = document.getElementById("imageGallery");
   const imageBox = document.createElement("div");
   imageBox.classList.add("image-box");
   imageBox.innerHTML = `
-    <img src="${imageUrl}" title="\"${imagePrompt}\" by ${playerId}" alt="\"${imagePrompt}"\" by ${playerId}">
+    <img src="${imageUrl}" title="${prompt} by ${playerId}" alt="${prompt} by ${playerId}">
     <p class="small">${playerId}</p>
   `;
+
   gallery.prepend(imageBox);
 }
 
