@@ -45,7 +45,9 @@ function displayError(errorMessage) {
 function handlePlayerId(id) {
   playerId = id;
   localStorage.setItem("playerId", playerId);
-  document.getElementById("playerId").innerText = playerId;
+  document.querySelectorAll(".playerId").forEach((playerIdEl) => {
+    playerIdEl.innerText = playerId;
+  });
   document.getElementById("startButton").disabled = false;
 }
 
