@@ -53,15 +53,6 @@ body {
   height: 100vh;
 }
 
-#gameSection .playerId {
-  float: left;
-}
-
-#gameSection .playerId:after {
-  content: ":\00a0";
-  display: inline-block;
-}
-
 ::-webkit-scrollbar {
   display: none;
 }
